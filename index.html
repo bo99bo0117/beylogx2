@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>BeyLog X</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#111111" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h1>BeyLog X</h1>
+    <div class="top-actions">
+      <button id="btnExport" class="ghost">Export</button>
+      <label class="ghost file">
+        Import
+        <input id="fileImport" type="file" accept="application/json" hidden>
+      </label>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="tabs">
+      <button class="tab active" data-tab="battle">バトル追加</button>
+      <button class="tab" data-tab="beys">図鑑</button>
+      <button class="tab" data-tab="recent">最近のバトル</button>
+      <button class="tab" data-tab="stats">集計</button>
+    </nav>
+
+    <!-- バトル追加 -->
+    <section id="tab-battle" class="tabpane active">
+      <form id="battleForm" class="card">
+        <h2>バトル追加</h2>
+
+        <div class="grid2">
+          <div>
+            <label>ベイA（自分/左）</label>
+            <select id="battleBeyA" required></select>
+          </div>
+          <div>
+            <label>ベイB（相手/右）</label>
+            <select id="battleBeyB" required></select>
+          </div>
+        </div>
+
+        <div class="row">
+          <label>勝者</label>
+          <div class="seg" role="group" aria-label="winner">
+            <input type="radio" name="winner" id="winA" value="A" required>
+            <label for="winA">A</label>
+            <input type="radio" name="winner" id="winB" value="B" required>
+            <label for="winB">B</label>
+          </div>
+        </div>
+
+        <div class="row">
+          <label>勝ち方</label>
+          <div class="seg" role="group" aria-label="finish">
+            <input type="radio" name="finish" id="fX" value="Xtreme" required>
+            <label for="fX">Xtreme</label>
+            <input type="radio" name="finish" id="fO" value="Over">
+            <label for="fO">Over</label>
+            <input type="radio" name="finish" id="fB" value="Burst">
+            <label for="fB">Burst</label>
+            <input type="radio" name="finish" id="fS" value="Spin">
+            <label for="fS">Spin</label>
+            <input type="radio" name="finish" id="fOt" value="Other">
+            <label for="fOt">Other</label>
+          </div>
+        </div>
+
+        <div class="grid2">
+          <div>
+            <label>場所</label>
+            <div class="seg" role="group" aria-label="place">
+              <input type="radio" name="place" id="pHome" value="家" required>
+              <label for="pHome">家</label>
+              <input type="radio" name="place" id="pPark" value="公園">
+              <label for="pPark">公園</label>
+              <input type="radio" name="place" id="pKids" value="児童館">
+              <label for="pKids">児童館</label>
+              <input type="radio" name="place" id="pFriend" value="友だちの家">
+              <label for="pFriend">友だちの家</label>
+              <input type="radio" name="place" id="pEvent" value="大会">
+              <label for="pEvent">大会</label>
+              <input type="radio" name="place" id="pOther" value="その他">
+              <label for="pOther">その他</label>
+            </div>
+          </div>
+          <div>
+            <label>記録者</label>
+            <div class="seg" role="group" aria-label="recorder">
+              <input type="radio" name="recorder" id="rKid" value="子ども" required>
+              <label for="rKid">子ども</label>
+              <input type="radio" name="recorder" id="rParent" value="親">
+              <label for="rParent">親</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid2">
+          <div>
+            <label>スコア（任意）</label>
+            <input id="battleScore" placeholder="例：3-2" />
+          </div>
+          <div>
+            <label>日時</label>
+            <input id="battleDateTime" type="datetime-local" />
+          </div>
+        </div>
+
+        <div class="row">
+          <label>ひとこと（任意）</label>
+          <textarea id="battleMemo" rows="2" placeholder="気づき・調整点など"></textarea>
+        </div>
+
+        <div class="actions">
+          <button type="submit">保存</button>
+        </div>
+        <p class="hint">最短入力：ベイA / ベイB / 勝者 / 勝ち方 / 場所 / 記録者</p>
+      </form>
+
+      <div class="card">
+        <h3>ヒント</h3>
+        <ul class="bullets">
+          <li>まず「図鑑」でベイを登録（写真必須）</li>
+          <li>バトルは5〜10秒で入力OK</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 図鑑 -->
+    <section id="tab-beys" class="tabpane">
+      <div class="card">
+        <div class="row-between">
+          <h2>図鑑</h2>
+          <button id="btnAddBey" class="ghost">＋ベイ追加</button>
+        </div>
+        <div id="beyGrid" class="grid"></div>
+      </div>
+    </section>
+
+    <!-- 最近のバトル -->
+    <section id="tab-recent" class="tabpane">
+      <div class="card">
+        <div class="row-between">
+          <h2>最近のバトル</h2>
+          <button id="btnClearBattles" class="danger ghost">全削除</button>
+        </div>
+        <div id="battleList" class="list"></div>
+      </div>
+    </section>
+
+    <!-- 集計 -->
+    <section id="tab-stats" class="tabpane">
+      <div class="card">
+        <h2>集計</h2>
+        <div id="statsSummary" class="stats"></div>
+        <h3>勝ち方（全体）</h3>
+        <div id="finishStats" class="list"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- モーダル：ベイ追加/編集 -->
+  <dialog id="beyDialog">
+    <form id="beyForm" method="dialog" class="modal">
+      <h2 id="beyDialogTitle">ベイ追加</h2>
+
+      <input type="hidden" id="beyId" />
+
+      <div class="row">
+        <label>公式名</label>
+        <input id="beyOfficialName" required placeholder="例：ドランソード…" />
+      </div>
+
+      <div class="grid3">
+        <div>
+          <label>Blade</label>
+          <input id="beyBlade" required />
+        </div>
+        <div>
+          <label>Ratchet</label>
+          <input id="beyRatchet" required />
+        </div>
+        <div>
+          <label>Bit</label>
+          <input id="beyBit" required />
+        </div>
+      </div>
+
+      <div class="grid2">
+        <div>
+          <label>Type</label>
+          <select id="beyType" required>
+            <option value="">選択</option>
+            <option>Attack</option>
+            <option>Defense</option>
+            <option>Stamina</option>
+            <option>Balance</option>
+          </select>
+        </div>
+        <div>
+          <label>入手日</label>
+          <input id="beyAcquired" type="date" />
+        </div>
+      </div>
+
+      <div class="row">
+        <label>写真（必須）</label>
+        <input id="beyPhoto" type="file" accept="image/*" capture="environment" required />
+        <div id="photoPreview" class="preview"></div>
+      </div>
+
+      <div class="row">
+        <label>お気に入り</label>
+        <label class="check">
+          <input id="beyFav" type="checkbox" />
+          ★
+        </label>
+      </div>
+
+      <div class="row">
+        <label>メモ（任意）</label>
+        <textarea id="beyNote" rows="2"></textarea>
+      </div>
+
+      <div class="actions">
+        <button value="cancel" class="ghost">キャンセル</button>
+        <button id="btnSaveBey" value="default">保存</button>
+      </div>
+      <p class="hint">写真は端末内に保存されます（容量に注意）。</p>
+    </form>
+  </dialog>
+
+  <!-- モーダル：ベイ詳細 -->
+  <dialog id="detailDialog">
+    <div class="modal">
+      <div class="row-between">
+        <h2 id="detailTitle">ベイ詳細</h2>
+        <button id="btnCloseDetail" class="ghost">閉じる</button>
+      </div>
+      <div id="detailBody"></div>
+    </div>
+  </dialog>
+
+  <script src="app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js').catch(()=>{});
+    }
+  </script>
+</body>
+</html>
